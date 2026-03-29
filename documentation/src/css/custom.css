@@ -2,11 +2,18 @@
  * Any CSS included here will be global. The classic template
  * bundles Infima by default. Infima is a CSS framework designed to
  * work well for content-centric websites.
+ * * ISSUE #39: Style Governance Note
+ * 1. Use design-tokens.css for all color/spacing variables.
+ * 2. Component-specific styles should stay in .module.css files.
  */
 
 /* ── Light Mode (Default) ───────────────────────────────────────────────────── */
 
 :root {
+  /* Typography — wire Infima to our design-token font stacks */
+  --ifm-font-family-base: var(--font-family-sans);
+  --ifm-font-family-monospace: var(--font-family-mono);
+
   /* Primary Colors */
   --ifm-color-primary: #2e8555;
   --ifm-color-primary-dark: #29784c;
@@ -225,6 +232,24 @@
   --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.3);
   --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.35);
   --shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.4);
+
+  /* Dark mode button tokens */
+  --sb-btn-shadow-focus: 0 0 0 3px rgba(79, 221, 191, 0.35);
+  --sb-btn-shadow-active: inset 0 2px 0 rgba(0, 0, 0, 0.28);
+  --sb-btn-secondary-bg: #0f172a;
+  --sb-btn-secondary-text: #e2e8f0;
+  --sb-btn-secondary-border: #334155;
+  --sb-btn-secondary-hover: #111b31;
+  --sb-btn-secondary-active: #1e293b;
+  --sb-btn-tertiary-bg: #1e293b;
+  --sb-btn-tertiary-text: #e2e8f0;
+  --sb-btn-tertiary-border: #334155;
+  --sb-btn-tertiary-hover: #334155;
+  --sb-btn-tertiary-active: #475569;
+  --sb-btn-ghost-text: #e2e8f0;
+  --sb-btn-ghost-hover: rgba(226, 232, 240, 0.12);
+  --sb-btn-ghost-active: rgba(226, 232, 240, 0.2);
+  --sb-btn-link-text: var(--ifm-color-primary-lightest);
 }
 
 /* ── Global Styles ──────────────────────────────────────────────────────────── */
@@ -360,29 +385,9 @@ html {
   footer {
     display: none !important;
   }
-  --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.3);
-
-  --sb-btn-shadow-focus: 0 0 0 3px rgba(79, 221, 191, 0.35);
-  --sb-btn-shadow-active: inset 0 2px 0 rgba(0, 0, 0, 0.28);
-
-  --sb-btn-secondary-bg: #0f172a;
-  --sb-btn-secondary-text: #e2e8f0;
-  --sb-btn-secondary-border: #334155;
-  --sb-btn-secondary-hover: #111b31;
-  --sb-btn-secondary-active: #1e293b;
-
-  --sb-btn-tertiary-bg: #1e293b;
-  --sb-btn-tertiary-text: #e2e8f0;
-  --sb-btn-tertiary-border: #334155;
-  --sb-btn-tertiary-hover: #334155;
-  --sb-btn-tertiary-active: #475569;
-
-  --sb-btn-ghost-text: #e2e8f0;
-  --sb-btn-ghost-hover: rgba(226, 232, 240, 0.12);
-  --sb-btn-ghost-active: rgba(226, 232, 240, 0.2);
-
-  --sb-btn-link-text: var(--ifm-color-primary-lightest);
 }
+
+/* ── Transition utilities ───────────────────────────────────────────────────── */
 
 @media (prefers-reduced-motion: reduce) {
   :root {
@@ -392,7 +397,6 @@ html {
   }
 }
 
-/* Transition utilities */
 .sb-transition-none {
   transition: none !important;
 }
@@ -412,7 +416,8 @@ html {
   transition-timing-function: var(--sb-motion-ease-standard) !important;
 }
 
-/* Button */
+/* ── Button ─────────────────────────────────────────────────────────────────── */
+
 .sb-btn {
   --_btn-bg: var(--sb-btn-primary-bg);
   --_btn-text: var(--sb-btn-primary-text);
@@ -483,7 +488,7 @@ html {
   border: 2px solid currentcolor;
   border-right-color: transparent;
   border-radius: 9999px;
-  animation: sb-spin 0.8s linear infinite;
+  animation: sb-spin var(--sb-motion-duration-slow) linear infinite;
 }
 
 @keyframes sb-spin {
@@ -580,7 +585,8 @@ html {
   border-color: transparent;
 }
 
-/* Button group */
+/* ── Button group ───────────────────────────────────────────────────────────── */
+
 .sb-btn-group {
   display: inline-flex;
   align-items: stretch;
@@ -621,7 +627,8 @@ html {
   margin-top: -1px;
 }
 
-/* Icon System */
+/* ── Icon System ────────────────────────────────────────────────────────────── */
+
 .icon {
   display: inline-flex;
   align-items: center;
@@ -677,4 +684,51 @@ html {
 
 .icon--right {
   margin-left: 0.5rem;
+}
+
+/* ── ISSUE #39: OPTIMIZED LOADING PRIMITIVES ────────────────────────────── */
+
+.skeleton-loader {
+  background-color: var(--color-gray-200);
+  background-image: linear-gradient(90deg, transparent, var(--loading-shimmer), transparent);
+  background-size: 200% 100%;
+  animation: shimmerEffect var(--loading-duration) infinite linear;
+  border-radius: var(--radius-md);
+}
+
+[data-theme='dark'] .skeleton-loader {
+  background-color: var(--color-gray-800);
+}
+
+.spinner-loader {
+  border: 3px solid var(--color-gray-200);
+  border-top: 3px solid var(--color-primary-500);
+  border-radius: var(--radius-full);
+  animation: spin var(--transition-slower) linear infinite;
+}
+
+@keyframes shimmerEffect {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* Respect reduced motion - Required for AC */
+@media (prefers-reduced-motion: reduce) {
+  .skeleton-loader,
+  .spinner-loader {
+    animation: none !important;
+  }
 }
